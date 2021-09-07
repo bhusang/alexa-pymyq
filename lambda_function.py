@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING
 
 import pymyq
 from aiohttp import ClientSession
+#from aiohttp import ClientSession
 from environs import Env
 from pymyq.api import API
 
@@ -56,11 +57,11 @@ class GarageRequestHandler:
         self.validate_env()
 
         # information messages that may be modified if there is only one door
-        self.move_msg = 'close the left or right door'
+        self.move_msg = 'close the edgewood or encinal garage door'
         if not self.only_close:
             self.move_msg = 'open or ' + self.move_msg
         self.check_msg = "check the state of your garage door by asking what's up"
-        self.check1_msg = 'check the state of your garage door by asking if the left or right door is open'
+        self.check1_msg = 'check the state of your garage door by asking if the edgewood or encinal door is open'
 
     def validate_env(self) -> None:
         """Make sure environment is set up correctly. Else raise an exception."""
@@ -74,7 +75,7 @@ class GarageRequestHandler:
         if not self.password:
             errors.append('PASSWORD environment variable needs to be set to your MyQ password')
 
-        self.left_door = env.int('LEFT', 0)
+        self.left_door = env.int('EDGEWOOD', 0)
         self.right_door = 1 - self.left_door
 
         self.only_close = env.bool('ONLY_CLOSE', True)
@@ -103,9 +104,9 @@ class GarageRequestHandler:
 
     def get_door_index(self, door_name: str) -> int:
         """Convert a door name to an index"""
-        if door_name == 'left':
+        if door_name == 'edgewood':
             return self.left_door
-        elif door_name == 'right':
+        elif door_name == 'encinal':
             return self.right_door
         elif door_name == 'both':
             return 0
@@ -235,9 +236,9 @@ class GarageRequestHandler:
         if door_state_left not in ['open', 'opening'] and door_state_right not in ['open', 'opening']:
             speech_output = 'Ok, opening both garage doors now'
         elif door_state_left not in ['open', 'opening']:
-            speech_output = 'Ok, opening the left garage door now'
+            speech_output = 'Ok, opening the edgewood garage door now'
         elif door_state_right not in ['open', 'opening']:
-            speech_output = 'Ok, opening the right garage door now'
+            speech_output = 'Ok, opening the encinal garage door now'
         else:
             speech_output = 'Both doors are open'
 
@@ -259,9 +260,9 @@ class GarageRequestHandler:
         if door_state_left not in ['closed', 'closing'] and door_state_right not in ['closed', 'closing']:
             speech_output = 'Ok, closing both garage doors now'
         elif door_state_left not in ['closed', 'closing']:
-            speech_output = 'Ok, closing the left garage door now'
+            speech_output = 'Ok, closing the edgewood garage door now'
         elif door_state_right not in ['closed', 'closing']:
-            speech_output = 'Ok, closing the right garage door now'
+            speech_output = 'Ok, closing the encinal garage door now'
         else:
             speech_output = 'Both doors are closed'
 
@@ -318,7 +319,7 @@ class GarageRequestHandler:
         if door_state_left == door_state_right:
             speech_output = f'Both doors are {door_state_left}'
         else:
-            speech_output = f'The left door is {door_state_left}, and the right door is {door_state_right}.'
+            speech_output = f'The edgewood door is {door_state_left}, and the encinal door is {door_state_right}.'
         card_title = 'Check door status'
 
         return self.build_speechlet_response(card_title, speech_output)
@@ -373,8 +374,8 @@ class GarageRequestHandler:
         self.myq = await pymyq.login(self.user_name, self.password, http_session)
 
         if self.has_one_door():
-            self.move_msg = self.move_msg.replace(' left or right', '')
-            self.check_msg = self.check1_msg = self.check1_msg.replace(' left or right', '')
+            self.move_msg = self.move_msg.replace(' edgewood or encinal', '')
+            self.check_msg = self.check1_msg = self.check1_msg.replace(' edgewood or encinal', '')
 
         if event['session']['new']:
             logger.info(f"New session: request_id={event['request']['requestId']}, " 

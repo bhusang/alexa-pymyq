@@ -41,8 +41,8 @@ def slot_value(slot_type, spoken_value, name=None, value_id=None):
     }
 
 
-left_door_name = slot_value('DoorName', 'the left door', 'left')
-one_door_name = slot_value('DoorName', '1', 'left')
+left_door_name = slot_value('DoorName', 'the edgewood door', 'edgewood')
+one_door_name = slot_value('DoorName', '1', 'edgewood')
 both_door_name = slot_value('DoorName', 'both doors', 'both')
 closed_door_state = slot_value('DoorState', 'closed')
 open_door_action = slot_value('DoorCommand', 'open')
@@ -58,7 +58,7 @@ def event():
 def test_launch(event):
     event['request']['type'] = 'LaunchRequest'
     result = lambda_handler(event)
-    assert result['response']['outputSpeech']['text'].startswith('You can open or close the left or right door')
+    assert result['response']['outputSpeech']['text'].startswith('You can open or close the edgewood or encinal garage door')
 
 
 def test_state(event):
@@ -70,7 +70,7 @@ def test_state(event):
             'State': closed_door_state
         }}
     result = lambda_handler(event)
-    assert result['response']['outputSpeech']['text'] == 'Yes, the left door is closed'
+    assert result['response']['outputSpeech']['text'] == 'Yes, the edgewood door is closed'
 
 
 def test_all_states(event):
@@ -102,7 +102,7 @@ def test_open(event, mocker):
                                       'Command': open_door_action
                                   }}
     result = lambda_handler(event)
-    assert result['response']['outputSpeech']['text'] == 'Ok, opening the left door now'
+    assert result['response']['outputSpeech']['text'] == 'Ok, opening the edgewood door now'
 
 
 # WARNING: this will close the actual door if it is open
@@ -137,7 +137,7 @@ def test_help(event):
     event['request']['type'] = 'IntentRequest'
     event['request']['intent'] = {'name': 'AMAZON.HelpIntent'}
     result = lambda_handler(event)
-    assert result['response']['outputSpeech']['text'].startswith('You can open or close the left or right door')
+    assert result['response']['outputSpeech']['text'].startswith('You can open or close the edgewood or encinal garage door')
 
 
 def test_stop(event):

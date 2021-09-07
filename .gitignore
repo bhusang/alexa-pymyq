@@ -3,3 +3,5 @@
 !lambda-upload.zip
 .python-version
 /.idea/
+.venv
+__pycache__
